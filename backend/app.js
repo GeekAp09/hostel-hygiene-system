@@ -4,10 +4,12 @@ require('./mongoose/mongoose')
 const Hostler = require('./models/hostlers')
 const ToClean = require('./models/CleaningRecord')
 const Cleaner = require('./models/cleaners')
+const cors = require('cors')
 
 const session = require('express-session')
 
 const app = express()
+app.use(cors())
 
 
 app.use(session({
@@ -26,10 +28,10 @@ app.use(HostlerRouter)
 app.use(CleanerRouter)
 
 // for Administrator pusrpose only
+
 app.post('/newhostler', async (req, res)=>{
 
     console.log(req.body)
-    
     try{
         const hostler = new Hostler(req.body)
         await hostler.save()
@@ -39,7 +41,6 @@ app.post('/newhostler', async (req, res)=>{
         console.log(e)
         res.send(e)
     }
-
 })
 
 app.post('/newcleaner', async (req, res)=>{
@@ -57,6 +58,28 @@ app.post('/newcleaner', async (req, res)=>{
     }
 
 })
+
+app.get('/', (req, res)=>{
+
+    res.send('hello')
+
+})
+
+app.get('/FetchTest', async (req, res)=>{
+
+    try{
+        const requests = await ToClean.find({})
+        console.log(requests)
+        res.send(requests)
+    }
+    
+    catch(e){
+    
+        console.log(e)
+        res.send(e)
+    
+    }
+    })    
 
 // Main Endpoints ---- use routers
 

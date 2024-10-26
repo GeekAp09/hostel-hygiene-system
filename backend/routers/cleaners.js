@@ -24,7 +24,6 @@ route.post('/cleanerlogin', async (req, res)=>{
 
 route.get('/NeededToClean', async (req, res)=>{
 
-
     try{
         const cleanerid = req.session.cleanerid
         console.log(cleanerid)

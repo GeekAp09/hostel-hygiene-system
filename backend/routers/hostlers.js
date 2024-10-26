@@ -23,8 +23,15 @@ route.post('/hostlerlogin', async (req, res)=>{
 
 route.post('/CleaningRequest', async (req, res)=>{
 
+    const rollnumber = req.session.rollnumber
+    console.log(rollnumber)
+
 try{
-    const newReq = new ToClean(req.body)
+
+    const hostler = await Hostler.findOne({rollnumber})
+    console.log(hostler)
+
+    const newReq = new ToClean({request: req.body.request, room: hostler.roomnumber, hostel: hostler.hostel})
     await newReq.save()
 
     console.log(newReq)
@@ -39,7 +46,7 @@ catch(e){
 }
 })
 
-route.get('/hostlerReq', async (req, res)=>{
+route.get('/FetchAllHostlerReq', async (req, res)=>{
 
 const rollnumber = req.session.rollnumber
 console.log(rollnumber)

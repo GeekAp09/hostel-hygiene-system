@@ -27,8 +27,8 @@ const UserSchema = new mongoose.Schema({
         default: false
     },
 
-    tags:{
-        type: [String]
+    request:{
+        type: String
     }
 
 },
@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema({
 {
     timestamps: true
 }
+
 )
 
 const ToClean = mongoose.model('ToClean', UserSchema)

@@ -28,10 +28,10 @@ app.use(HostlerRouter)
 app.use(CleanerRouter)
 
 // for Administrator pusrpose only
+
 app.post('/newhostler', async (req, res)=>{
 
     console.log(req.body)
-    
     try{
         const hostler = new Hostler(req.body)
         await hostler.save()
@@ -41,7 +41,6 @@ app.post('/newhostler', async (req, res)=>{
         console.log(e)
         res.send(e)
     }
-
 })
 
 app.post('/newcleaner', async (req, res)=>{

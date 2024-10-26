@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 .parent-container{
     display: flex;
     flex-direction: column;
@@ -10,8 +12,10 @@
 .wrapper {
     position: relative;
     display: flex;
+    justify-content: center;
     flex-direction: row;
     gap: 10px;
+    flex-wrap: wrap;
   }
   
   .card {
@@ -23,6 +27,8 @@
     border-radius: 10px;
     transition: all 0.3s;
   }
+
+  
   
   .card:hover {
     transform: scale(1.05);
@@ -114,9 +120,15 @@
   }
   
 
+  .raise-request-container{
+    display: flex;
+    justify-content: center;
+  }
   .lower_card {
     padding: 20px;
     width: 400px;
+    display: flex;
+    justify-content: center;
     /* background: #FFFFFF; */
     /* box-shadow: 0px 187px 75px rgba(0, 0, 0, 0.01), 0px 105px 63px rgba(0, 0, 0, 0.05), 0px 47px 47px rgba(0, 0, 0, 0.09), 0px 12px 26px rgba(0, 0, 0, 0.1), 0px 0px 0px rgba(0, 0, 0, 0.1); */
   }
@@ -140,7 +152,7 @@
   }
   
   .coupons form {
-    display: grid;
+    display: flex;
     grid-template-columns: 1fr 80px;
     gap: 10px;
     padding: 10px;
@@ -264,3 +276,102 @@ flex-direction: column;
     }
   }
   
+
+  /* General
+   Table Styling */
+.table {
+    font-family: "Open Sans", sans-serif;
+    margin-top: 30px;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    /* margin: 0; */
+    padding: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  .caption {
+    font-size: 1.5em;
+    margin: 0.5em 0 0.75em;
+  }
+  
+  .tr {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: 0.35em;
+  }
+  
+  .th,
+  .td {
+    padding: 0.625em;
+    text-align: center;
+  }
+  
+  .th {
+    font-size: 0.85em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  
+  /* Responsive Styles for Mobile */
+  @media screen and (max-width: 600px) {
+    .table {
+      border: 0;
+    }
+  
+    .caption {
+      font-size: 1.3em;
+    }
+  
+    .thead {
+      border: none;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+  
+    .tr {
+      border-bottom: 3px solid #ddd;
+      display: block;
+      margin-bottom: 0.625em;
+    }
+  
+    .td {
+      border-bottom: 1px solid #ddd;
+      display: block;
+      font-size: 0.8em;
+      text-align: right;
+    }
+  
+    .td::before {
+      content: attr(data-label);
+      float: left;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  
+    .td:last-child {
+      border-bottom: 0;
+    }
+  }
+  
+
+.request_logo{
+
+    width: 18px;
+    margin-right: 5px;
+    margin-top: 5px;
+}
+
+.ststyle{
+    display: inline;
+  color: white; /* Set text color */
+  padding: 2px 10px; 
+  border-radius: 30px;
+  font-weight: 300;
+  font-size: 0.8em;
+}

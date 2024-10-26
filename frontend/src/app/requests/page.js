@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './requests.module.css';  // Import CSS module correctly
+import cleaner from "/public/cleaner.svg"
 
 const Page = () => {
 
@@ -20,6 +21,11 @@ const Page = () => {
         { id: 14, date: '2024-02-20', status: 'pending', request: 'cleaning' },
         { id: 15, date: '2024-03-17', status: 'complete', request: 'maintenance' },
       ];
+
+    const orders = [  { id: 10001, details: 'Kring New Fit office chair, mesh + PU, black', status: 'delivered', date: '16/10/2021', total: '$200.00' },
+    { id: 10002, details: 'Kring New Fit office chair, mesh + PU, black', status: 'shipped', date: '16/10/2021', total: '$200.00' },
+    { id: 10003, details: 'Kring New Fit office chair, mesh + PU, black', status: 'canceled', date: '16/10/2021', total: '$200.00' }
+  ];
       
   return (
     <>
@@ -61,23 +67,65 @@ const Page = () => {
       </div>
 
 <h2>Your Previous Requests:</h2>
-<div className={styles["order_headings"]}>
-    <div>Title</div>
-    <div>Order Date</div>
-    <div>Status</div>
-</div>
-<div className={styles["request_order"]}>
+<div>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.tr}>
+            <th className={styles.th}>Request</th>
+            <th className={styles.th}>Due Date</th>
+            <th className={styles.th}>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
     {dummyData.map((t,id)=>{
         return (
-            <div className={styles["order_container"]}>
-            <div className={styles.order_title}>{t.request}</div>
-            <div className={styles.order_date}>{t.date}</div>
-            <div className={styles.order_status}>{t.status}</div>
-            </div>
+            <tr className={styles.tr} id=''>
+            <td className={styles.td} data-label="Request"><img src={t.request==="cleaning"?"/cleaner.svg" :"/maintainence.svg"} alt="" className={styles.request_logo} />{t.request.toLocaleUpperCase()}</td>
+            <td className={styles.td} data-label="Due Date">{t.date}</td>
+            <td className={styles.td} data-label="Status"><div className={styles.ststyle}  style={{ backgroundColor: t.status === "pending" ? "#F04F4F" : "#10A37F" }}>{t.status}</div></td>
+            </tr>
         )
     })}
-</div>
+
+</tbody>
+      </table>
+    </div>
+
+
       </div>
+      {/* <div>
+      <table className={styles.table}>
+        <thead>
+          <tr className={styles.tr}>
+            <th className={styles.th}>Account</th>
+            <th className={styles.th}>Due Date</th>
+            <th className={styles.th}>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+          <tr className={styles.tr}>
+            <td className={styles.td} data-label="Account">Visa - 3412</td>
+            <td className={styles.td} data-label="Due Date">04/01/2016</td>
+            <td className={styles.td} data-label="Amount">$1,190</td>
+            </tr>
+          <tr className={styles.tr}>
+            <td className={styles.td} data-label="Account">Visa - 6076</td>
+            <td className={styles.td} data-label="Due Date">03/01/2016</td>
+            <td className={styles.td} data-label="Amount">$2,443</td>
+            </tr>
+          <tr className={styles.tr}>
+            <td className={styles.td} data-label="Account">Corporate AMEX</td>
+            <td className={styles.td} data-label="Due Date">03/01/2016</td>
+            <td className={styles.td} data-label="Amount">$1,181</td>
+            </tr>
+          <tr className={styles.tr}>
+            <td className={styles.td} data-label="Account">Visa - 3412</td>
+            <td className={styles.td} data-label="Due Date">02/01/2016</td>
+            <td className={styles.td} data-label="Amount">$842</td>
+            </tr>
+        </tbody>
+      </table>
+    </div> */}
     </>
   );
 };

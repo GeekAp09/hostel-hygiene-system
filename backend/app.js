@@ -4,10 +4,12 @@ require('./mongoose/mongoose')
 const Hostler = require('./models/hostlers')
 const ToClean = require('./models/CleaningRecord')
 const Cleaner = require('./models/cleaners')
+const cors = require('cors')
 
 const session = require('express-session')
 
 const app = express()
+app.use(cors())
 
 
 app.use(session({

@@ -59,6 +59,12 @@ app.post('/newcleaner', async (req, res)=>{
 
 })
 
+app.get('/', (req, res)=>{
+
+    res.send('hello')
+
+})
+
 // Main Endpoints ---- use routers
 
 

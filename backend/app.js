@@ -65,6 +65,22 @@ app.get('/', (req, res)=>{
 
 })
 
+app.get('/FetchTest', async (req, res)=>{
+
+    try{
+        const requests = await ToClean.find({})
+        console.log(requests)
+        res.send(requests)
+    }
+    
+    catch(e){
+    
+        console.log(e)
+        res.send(e)
+    
+    }
+    })    
+
 // Main Endpoints ---- use routers
 
 

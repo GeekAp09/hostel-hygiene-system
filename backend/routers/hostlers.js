@@ -46,7 +46,7 @@ catch(e){
 }
 })
 
-route.get('/FetchAllHostlerReq', async (req, res)=>{
+route.post('/FetchAllHostlerReq', async (req, res)=>{
 
 const { rollnumber } = req.body
 

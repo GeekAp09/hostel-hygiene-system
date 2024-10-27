@@ -9,6 +9,11 @@
     /* border: 1px solid black; */
 }
 
+.navbar{
+  display: flex;
+  margin-bottom: 30px;
+  gap:20px;
+}
 .wrapper {
     position: relative;
     display: flex;

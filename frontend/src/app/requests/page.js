@@ -79,7 +79,7 @@ const Page = () => {
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('user'); // Clear user data from localStorage
-    router.push('/login'); // Redirect to login page
+    router.push('/Login'); // Redirect to login page
   };
 
   // Format date for display

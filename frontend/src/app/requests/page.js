@@ -159,7 +159,7 @@ const Page = () => {
               </tr>
             </thead>
             <tbody>
-              {previousRequests.length > 1 &&
+              {previousRequests.length > 0 &&
                 previousRequests.map((request, id) => (
                   <tr className={styles.tr} key={id}>
                     <td className={styles.td} data-label="Request">

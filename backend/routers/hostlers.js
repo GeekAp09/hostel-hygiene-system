@@ -9,7 +9,7 @@ route.post('/hostlerlogin', async (req, res)=>{
     try{
     console.log(req.body)
     const hostler = await Hostler.findByCredentials(req.body.rollnumber, req.body.password)
-    req.session.rollnumber = hostler.rollnumber
+    // req.session.rollnumber = hostler.rollnumber
     
     res.send(hostler)
 
@@ -23,7 +23,7 @@ route.post('/hostlerlogin', async (req, res)=>{
 
 route.post('/CleaningRequest', async (req, res)=>{
 
-    const rollnumber = req.session.rollnumber
+    const { rollnumber } = req.body
     console.log(rollnumber)
 
 try{
@@ -48,7 +48,8 @@ catch(e){
 
 route.get('/FetchAllHostlerReq', async (req, res)=>{
 
-const rollnumber = req.session.rollnumber
+const { rollnumber } = req.body
+
 console.log(rollnumber)
 try{
     const hostler = await Hostler.findOne({rollnumber})

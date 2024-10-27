@@ -12,12 +12,12 @@ const app = express()
 app.use(cors())
 
 
-app.use(session({
-    secret: 'your_secret_key',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { maxAge: 30 * 60 * 1000 } // Session expires after 30 minutes
-}));
+// app.use(session({
+//     secret: 'your_secret_key',
+//     resave: false,
+//     saveUninitialized: true,
+//     cookie: { maxAge: 30 * 60 * 1000 } // Session expires after 30 minutes
+// }));
 
 
 const HostlerRouter = require('./routers/hostlers')

@@ -22,7 +22,7 @@ route.post('/cleanerlogin', async (req, res)=>{
     }
 })
 
-route.get('/NeededToClean', async (req, res)=>{
+route.post('/NeededToClean', async (req, res)=>{
 
     try{
         const {cleanerid} = req.body
@@ -40,7 +40,6 @@ route.get('/NeededToClean', async (req, res)=>{
     catch(e){
         res.send(e)
     }
-
 })
 
 module.exports = route

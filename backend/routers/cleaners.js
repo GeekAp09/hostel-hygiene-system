@@ -11,7 +11,7 @@ route.post('/cleanerlogin', async (req, res)=>{
     try{
     console.log(req.body)
     const cleaner = await Cleaner.findByCredentials(req.body.cleanerid, req.body.password)
-    req.session.cleanerid = cleaner.cleanerid
+    // req.session.cleanerid = cleaner.cleanerid
     
     res.send(cleaner)
 
@@ -22,10 +22,10 @@ route.post('/cleanerlogin', async (req, res)=>{
     }
 })
 
-route.get('/NeededToClean', async (req, res)=>{
+route.post('/NeededToClean', async (req, res)=>{
 
     try{
-        const cleanerid = req.session.cleanerid
+        const {cleanerid} = req.body
         console.log(cleanerid)
         const cleaner = await Cleaner.findOne({cleanerid})
     
@@ -40,7 +40,6 @@ route.get('/NeededToClean', async (req, res)=>{
     catch(e){
         res.send(e)
     }
-
 })
 
 module.exports = route

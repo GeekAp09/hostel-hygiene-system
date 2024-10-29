@@ -1,7 +1,7 @@
 const express = require('express')
 const Hostler = require('../models/hostlers')
 const ToClean = require('../models/CleaningRecord')
-const Cleaner = require('../models/cleaners')
+const Cleaner = require('../models/staff')
 
 const route = new express.Router()
 

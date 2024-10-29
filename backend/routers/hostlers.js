@@ -83,7 +83,7 @@ try{
     const hostler = await Hostler.findOne({rollnumber})
     console.log(hostler)
 
-    const request = await ToClean.findOne({room: hostler.roomnumber, hostel: hostler.hostel, completed: false})
+    const request = await ToClean.findOne({room: hostler.roomnumber, hostel: hostler.hostel, completed: false, request: req.body.request})
 
     request.completed = true
     request.status = "Completed"

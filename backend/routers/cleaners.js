@@ -18,7 +18,7 @@ route.post('/cleanerlogin', async (req, res)=>{
     }
     catch(e){
         console.log(e)
-        res.send(e)
+        res.status(400).send(e)
     }
 })
 

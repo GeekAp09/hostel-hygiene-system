@@ -43,7 +43,7 @@ userschema.statics.findByCredentials = async(cleanerid, password)=>{
     const isMatch = bcrypt.compare(password, cleaner.password)
 
     if(!isMatch){
-        throw new Error('unable to login')
+        return new Error('unable to login')
     }
 
     return cleaner

@@ -7,16 +7,16 @@ const route = new express.Router()
 route.post('/hostlerlogin', async (req, res)=>{
 
     try{
+        
     console.log(req.body)
     const hostler = await Hostler.findByCredentials(req.body.rollnumber, req.body.password)
-    // req.session.rollnumber = hostler.rollnumber
     
     res.send(hostler)
 
     }
     catch(e){
         console.log(e)
-        res.send(e)
+        res.status(400).send(e)
     }
 })
 

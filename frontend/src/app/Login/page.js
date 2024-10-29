@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation'; // Use Next.js router
+import { useRouter } from 'next/navigation';
 import axiosInstance from '@/utils/axios';
 import styles from './Login.module.css';
 
@@ -10,58 +10,59 @@ const Login = () => {
   const [rollNumber, setRollNumber] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const router = useRouter(); // Next.js router for navigation
+  const [loading, setLoading] = useState(false);  // Add loading state
+  const router = useRouter();
 
-  // Check if user is already logged in and redirect
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      router.push('/requests'); // Redirect to /requests if user is already logged in
+      router.push('/requests');
     }
   }, [router]);
 
-  // Function to toggle between Student and Cleaner login
   const toggleUserType = () => {
     setUser(user === 'Student' ? 'Cleaner' : 'Student');
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault();
+    setLoading(true);  // Start loader
 
     if (user === 'Student') {
       try {
-        // Use axios instance with custom baseURL for student login
         const response = await axiosInstance.post('/hostlerlogin', {
           rollnumber: rollNumber,
           password: password,
         });
 
-        // On successful login - store data in localStorage
         localStorage.setItem('user', JSON.stringify(response.data));
-
-        // Redirect to the requests page
+        setLoading(false);  // Stop loader
         router.push('/requests');
       } catch (error) {
-        console.error('Login error:', error);
-        setErrorMessage('Login failed. Please check your roll number and password.');
+        setLoading(false);  // Stop loader
+        if (error.response && error.response.status === 400) {
+          setErrorMessage('Login failed. Please check your credentials.');
+        } else {
+          setErrorMessage('An error occurred. Please try again later.');
+        }
       }
     } else {
       try {
-        // Use axios instance with custom baseURL for cleaner login
         const response = await axiosInstance.post('/cleanerlogin', {
-          cleanerid: rollNumber, // Using cleanerid instead of roll number
+          cleanerid: rollNumber,
           password: password,
         });
 
-        // On successful login - store cleaner data in localStorage
         localStorage.setItem('user', JSON.stringify(response.data));
-
-        // Redirect to the requests page
+        setLoading(false);  // Stop loader
         router.push('/requests');
       } catch (error) {
-        console.error('Cleaner login error:', error);
-        setErrorMessage('Login failed. Please check your cleaner ID and password.');
+        setLoading(false);  // Stop loader
+        if (error.response && error.response.status === 400) {
+          setErrorMessage('Login failed. Please check your credentials.');
+        } else {
+          setErrorMessage('An error occurred. Please try again later.');
+        }
       }
     }
   };
@@ -81,7 +82,7 @@ const Login = () => {
               type="number"
               className={styles.input}
               value={rollNumber}
-              onChange={(e) => setRollNumber(e.target.value)} 
+              onChange={(e) => setRollNumber(e.target.value)}
             />
             <span>{user === 'Student' ? 'Roll no.' : 'Cleaner ID'}</span>
           </label>
@@ -93,13 +94,19 @@ const Login = () => {
               type="password"
               className={styles.input}
               value={password}
-              onChange={(e) => setPassword(e.target.value)} 
+              onChange={(e) => setPassword(e.target.value)}
             />
             <span>Password</span>
           </label>
 
-          <button className={styles.submit}>Submit</button>
+          <button className={styles.submit} disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit'}
+          </button>
+
           {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+
+          {loading && <div className={styles.loader}></div>} {/* Loader element */}
+
           <p className={styles.signin}>
             Forgot Your Password? <a href="#">Reset Password</a>
           </p>

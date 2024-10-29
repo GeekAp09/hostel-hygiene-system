@@ -33,7 +33,6 @@ userschema.pre('save', async function(next){
 
 })
 
-const Cleaner = mongoose.model('cleaner', userschema)
 
 userschema.statics.findByCredentials = async(cleanerid, password)=>{
     
@@ -52,6 +51,6 @@ userschema.statics.findByCredentials = async(cleanerid, password)=>{
 
 }
 
-
+const Cleaner = mongoose.model('cleaner', userschema)
 
 module.exports = Cleaner

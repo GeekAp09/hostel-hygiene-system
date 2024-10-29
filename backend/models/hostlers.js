@@ -43,8 +43,6 @@ UserSchema.pre('save', async function(next){
 })
 
 
-const Hostler = mongoose.model('hostlers', UserSchema)
-
 UserSchema.statics.findByCredentials = async(rollnumber, password)=>{
     
     const hostler = await Hostler.findOne({rollnumber})
@@ -62,5 +60,7 @@ UserSchema.statics.findByCredentials = async(rollnumber, password)=>{
     return hostler
 
 }
+
+const Hostler = mongoose.model('hostlers', UserSchema)
 
 module.exports = Hostler

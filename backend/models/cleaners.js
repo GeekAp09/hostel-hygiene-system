@@ -33,6 +33,8 @@ userschema.pre('save', async function(next){
 
 })
 
+const Cleaner = mongoose.model('cleaner', userschema)
+
 userschema.statics.findByCredentials = async(cleanerid, password)=>{
     
     const cleaner = await Cleaner.findOne({cleanerid})
@@ -40,10 +42,10 @@ userschema.statics.findByCredentials = async(cleanerid, password)=>{
         throw new Error('unable to login')
     }
 
-    const isMatch = bcrypt.compare(password, cleaner.password)
+    const isMatch = await bcrypt.compare(password, cleaner.password)
 
     if(!isMatch){
-        return new Error('unable to login')
+        throw new Error('unable to login')
     }
 
     return cleaner
@@ -51,6 +53,5 @@ userschema.statics.findByCredentials = async(cleanerid, password)=>{
 }
 
 
-const Cleaner = mongoose.model('cleaner', userschema)
 
 module.exports = Cleaner

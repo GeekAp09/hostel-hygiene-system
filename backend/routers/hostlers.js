@@ -31,7 +31,7 @@ try{
     const hostler = await Hostler.findOne({rollnumber})
     console.log(hostler)
 
-    const PendingRequest = await ToClean.countDocuments({room: hostler.roomnumber, hostel: hostler.hostel, completed: false})
+    const PendingRequest = await ToClean.countDocuments({room: hostler.roomnumber, hostel: hostler.hostel, completed: false, request: req.body.request})
     console.log(PendingRequest)
     if(PendingRequest>0){
         throw new Error ("Request already submitted")

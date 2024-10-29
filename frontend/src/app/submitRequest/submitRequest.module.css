@@ -238,3 +238,8 @@
 .main_image{
   width: 40px;
 }
+
+.checkout-btn:hover{
+  transform: scale(1.1);
+  cursor: pointer;
+}

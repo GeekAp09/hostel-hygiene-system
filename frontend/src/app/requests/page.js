@@ -1,18 +1,19 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import styles from './requests.module.css'; // Import CSS module correctly
 import axiosInstance from '@/utils/axios';
+import styles from './requests.module.css'; // Import CSS module correctly
 
 const Page = () => {
   const [service, setService] = useState('');
   const [userType, setUserType] = useState(''); // Track if user is Student or Cleaner
   const [name, setName] = useState('');
   const [roomNumber, setRoomNumber] = useState('');
+  const [rollnumber, setRollNumber] = useState('');
   const [hostel, setHostel] = useState('');
   const [previousRequests, setPreviousRequests] = useState([]); // To store fetched data
   const [sessionData, setSessionData] = useState({});
+  const [toastMessage, setToastMessage] = useState(''); // Toast message state
   const router = useRouter();
 
   // Fetch the user data from localStorage when the component mounts
@@ -23,6 +24,7 @@ const Page = () => {
 
       if (parsedUser.rollnumber) {
         // If rollnumber exists, it's a student
+        setRollNumber(parsedUser.rollnumber);
         setUserType('Student');
         setName(parsedUser.name);
         setRoomNumber(parsedUser.roomnumber);
@@ -37,15 +39,6 @@ const Page = () => {
         fetchCleanerRequests(parsedUser.cleanerid);
       }
     }
-
-    // Fetching everything from sessionStorage
-    const sessionDataObj = {};
-    for (let i = 0; i < sessionStorage.length; i++) {
-      const key = sessionStorage.key(i);
-      const value = sessionStorage.getItem(key);
-      sessionDataObj[key] = value; // Store session data in an object
-    }
-    setSessionData(sessionDataObj); // Store session data in state
   }, []);
 
   // Fetch previous requests for the student using rollnumber
@@ -56,7 +49,6 @@ const Page = () => {
         { rollnumber }, // Pass roll number in the request body
       );
       setPreviousRequests(response.data); // Store fetched requests in state
-      console.log('Previous Requests:', response.data); // Print response to the console
     } catch (error) {
       console.error('Error fetching previous requests:', error);
     }
@@ -70,7 +62,6 @@ const Page = () => {
         { cleanerid }, // Pass cleanerid in the request body
       );
       setPreviousRequests(response.data); // Store fetched requests in state
-      console.log('Cleaner Requests:', response.data); // Print response to the console
     } catch (error) {
       console.error('Error fetching cleaner requests:', error);
     }
@@ -82,14 +73,65 @@ const Page = () => {
     router.push('/Login'); // Redirect to login page
   };
 
+  // Handle service selection and store it in localStorage
+  const handleServiceSelect = (selectedService) => {
+    setService(selectedService);
+    const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+    storedUser.request = selectedService; // Add selected service to user data
+    localStorage.setItem('user', JSON.stringify(storedUser)); // Update user data in localStorage
+  };
+
+  // Handle form submit and redirect to /submitRequest
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (service) {
+      router.push('/submitRequest'); // Redirect to /submitRequest after selecting service
+    } else {
+      alert('Please select a service before submitting.');
+    }
+  };
+
   // Format date for display
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  // Toast handler to show popup and clear message after a few seconds
+  const showToast = (message) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage('');
+    }, 3000); // Clear message after 3 seconds
+  };
+
+  // Handle request completion
+  const completeHandler = async (request) => {
+    try {
+      const response = await axiosInstance.post('/Completed', {
+        request,
+        rollnumber,
+      });
+      
+      if (response.status === 200) {
+        // Re-fetch previous requests to re-render the table
+        fetchPreviousRequests(rollnumber);
+        showToast('Request marked as completed successfully!');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        showToast('Request already exists or there was an error processing it.');
+      } else {
+        showToast('An unexpected error occurred.');
+      }
+    }
+  };
+
   return (
     <>
+      {/* Toast Popup */}
+      {toastMessage && <div className={styles.toast}>{toastMessage}</div>}
+
       <div className={styles['parent-container']}>
         <div className={styles.navbar}>
           {/* Dynamically display the user's name and either room number or hostel */}
@@ -108,10 +150,8 @@ const Page = () => {
                   className={styles.input}
                   type="radio"
                   name="card"
-                  value="basic"
-                  onClick={() => {
-                    setService('cleaning');
-                  }}
+                  value="cleaning"
+                  onClick={() => handleServiceSelect('cleaning')}
                 />
                 <span className={styles.check}></span>
                 <label className={styles.label}>
@@ -125,10 +165,8 @@ const Page = () => {
                   className={styles.input}
                   type="radio"
                   name="card"
-                  value="standart"
-                  onChange={() => {
-                    setService('maintain');
-                  }}
+                  value="maintain"
+                  onClick={() => handleServiceSelect('maintain')}
                 />
                 <span className={styles.check}></span>
                 <label className={styles.label}>
@@ -140,7 +178,7 @@ const Page = () => {
 
             <div className={styles['raise-request-container']}>
               <div className={styles.lower_card}>
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleSubmit}>
                   <button className={styles.btn}>Submit</button>
                 </form>
               </div>
@@ -154,6 +192,10 @@ const Page = () => {
             <thead>
               <tr className={styles.tr}>
                 <th className={styles.th}>Request</th>
+                {userType === 'Cleaner'? 
+                <th className={styles.th}>Room No.</th>
+                :""}
+
                 <th className={styles.th}>Due Date</th>
                 <th className={styles.th}>Status</th>
               </tr>
@@ -170,16 +212,30 @@ const Page = () => {
                       />
                       {request.request.toUpperCase()}
                     </td>
+                    {userType === 'Cleaner'? 
+                    <td className={styles.td} data-label="Room No.">
+                      {request.room}
+                    </td> : ""}
                     <td className={styles.td} data-label="Due Date">
                       {formatDate(request.createdAt)}
                     </td>
                     <td className={styles.td} data-label="Status">
-                      <div
+                    {userType === 'Student' && request.status === "Pending" ?
+                    
+                    <div className={styles.pending_parent}>
+                    <div
                         className={styles.ststyle}
-                        style={{ backgroundColor: request.status === 'Pending' ? '#F04F4F' : '#10A37F' }}
-                      >
+                        style={{ backgroundColor: request.status === 'Pending' ? '#F04F4F' : '#10A37F' }}>
                         {request.status}
-                      </div>
+                        </div>
+                        <button className={styles.btntick} onClick={()=>completeHandler(request.request)}><img src="./tick.svg" alt="" className={styles.finalTick} /></button>
+                    </div>
+                      :<div
+                        className={styles.ststyle}
+                        style={{ backgroundColor: request.status === 'Pending' ? '#F04F4F' : '#10A37F' }}>
+                        {request.status}
+                        </div>
+}
                     </td>
                   </tr>
                 ))}

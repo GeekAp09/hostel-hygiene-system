@@ -46,11 +46,12 @@ UserSchema.pre('save', async function(next){
 UserSchema.statics.findByCredentials = async(rollnumber, password)=>{
     
     const hostler = await Hostler.findOne({rollnumber})
+    
     if(!hostler){
-        throw new Error('unable to login')
+        return new Error('unable to login')
     }
 
-    const isMatch = bcrypt.compare(password, hostler.password)
+    const isMatch = await bcrypt.compare(password, hostler.password)
 
     if(!isMatch){
         throw new Error('unable to login')

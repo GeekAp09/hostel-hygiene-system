@@ -3,7 +3,7 @@ require('./mongoose/mongoose')
 
 const Hostler = require('./models/hostlers')
 const ToClean = require('./models/CleaningRecord')
-const Cleaner = require('./models/cleaners')
+const Cleaner = require('./models/staff')
 const cors = require('cors')
 
 const session = require('express-session')

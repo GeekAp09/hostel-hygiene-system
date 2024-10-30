@@ -1,131 +1,248 @@
-import React from 'react';
-import styles from './requests.module.css';  // Import CSS module correctly
-import cleaner from "/public/cleaner.svg"
+'use client';
+import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import axiosInstance from '@/utils/axios';
+import styles from './requests.module.css'; // Import CSS module correctly
 
 const Page = () => {
+  const [service, setService] = useState('');
+  const [userType, setUserType] = useState(''); // Track if user is Student or Cleaner
+  const [name, setName] = useState('');
+  const [roomNumber, setRoomNumber] = useState('');
+  const [rollnumber, setRollNumber] = useState('');
+  const [hostel, setHostel] = useState('');
+  const [previousRequests, setPreviousRequests] = useState([]); // To store fetched data
+  const [sessionData, setSessionData] = useState({});
+  const [toastMessage, setToastMessage] = useState(''); // Toast message state
+  const router = useRouter();
 
-    const dummyData = [
-        { id: 1, date: '2024-01-12', status: 'complete', request: 'cleaning' },
-        { id: 2, date: '2024-02-15', status: 'pending', request: 'maintenance' },
-        { id: 3, date: '2024-03-02', status: 'complete', request: 'cleaning' },
-        { id: 4, date: '2024-04-18', status: 'pending', request: 'maintenance' },
-        { id: 5, date: '2024-05-10', status: 'complete', request: 'cleaning' },
-        { id: 6, date: '2024-06-22', status: 'pending', request: 'cleaning' },
-        { id: 7, date: '2024-07-05', status: 'complete', request: 'maintenance' },
-        { id: 8, date: '2024-08-14', status: 'pending', request: 'cleaning' },
-        { id: 9, date: '2024-09-28', status: 'complete', request: 'maintenance' },
-        { id: 10, date: '2024-10-07', status: 'pending', request: 'maintenance' },
-        { id: 11, date: '2024-11-11', status: 'complete', request: 'cleaning' },
-        { id: 12, date: '2024-12-19', status: 'pending', request: 'maintenance' },
-        { id: 13, date: '2024-01-03', status: 'complete', request: 'cleaning' },
-        { id: 14, date: '2024-02-20', status: 'pending', request: 'cleaning' },
-        { id: 15, date: '2024-03-17', status: 'complete', request: 'maintenance' },
-      ];
+  // Fetch the user data from localStorage when the component mounts
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
 
-    const orders = [  { id: 10001, details: 'Kring New Fit office chair, mesh + PU, black', status: 'delivered', date: '16/10/2021', total: '$200.00' },
-    { id: 10002, details: 'Kring New Fit office chair, mesh + PU, black', status: 'shipped', date: '16/10/2021', total: '$200.00' },
-    { id: 10003, details: 'Kring New Fit office chair, mesh + PU, black', status: 'canceled', date: '16/10/2021', total: '$200.00' }
-  ];
+      if (parsedUser.rollnumber) {
+        // If rollnumber exists, it's a student
+        setRollNumber(parsedUser.rollnumber);
+        setUserType('Student');
+        setName(parsedUser.name);
+        setRoomNumber(parsedUser.roomnumber);
+        // Fetch previous requests using rollnumber
+        fetchPreviousRequests(parsedUser.rollnumber);
+      } else if (parsedUser.cleanerid) {
+        // If cleanerid exists, it's a cleaner
+        setUserType('Cleaner');
+        setName(parsedUser.name);
+        setHostel(parsedUser.hostel);
+        // Fetch requests specific to cleaners
+        fetchCleanerRequests(parsedUser.cleanerid);
+      }
+    }
+  }, []);
+
+  // Fetch previous requests for the student using rollnumber
+  const fetchPreviousRequests = async (rollnumber) => {
+    try {
+      const response = await axiosInstance.post(
+        '/FetchAllHostlerReq', // Using a POST request
+        { rollnumber }, // Pass roll number in the request body
+      );
+      setPreviousRequests(response.data); // Store fetched requests in state
+    } catch (error) {
+      console.error('Error fetching previous requests:', error);
+    }
+  };
+
+  // Fetch cleaning requests for the cleaner using cleanerid
+  const fetchCleanerRequests = async (cleanerid) => {
+    try {
+      const response = await axiosInstance.post(
+        '/NeededToClean', // Using the correct endpoint for cleaners
+        { cleanerid }, // Pass cleanerid in the request body
+      );
+      setPreviousRequests(response.data); // Store fetched requests in state
+    } catch (error) {
+      console.error('Error fetching cleaner requests:', error);
+    }
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('user'); // Clear user data from localStorage
+    router.push('/Login'); // Redirect to login page
+  };
+
+  // Handle service selection and store it in localStorage
+  const handleServiceSelect = (selectedService) => {
+    setService(selectedService);
+    const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+    storedUser.request = selectedService; // Add selected service to user data
+    localStorage.setItem('user', JSON.stringify(storedUser)); // Update user data in localStorage
+  };
+
+  // Handle form submit and redirect to /submitRequest
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (service) {
+      router.push('/submitRequest'); // Redirect to /submitRequest after selecting service
+    } else {
+      alert('Please select a service before submitting.');
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Toast handler to show popup and clear message after a few seconds
+  const showToast = (message) => {
+    setToastMessage(message);
+    setTimeout(() => {
+      setToastMessage('');
+    }, 3000); // Clear message after 3 seconds
+  };
+
+  // Handle request completion
+  const completeHandler = async (request) => {
+    try {
+      const response = await axiosInstance.post('/Completed', {
+        request,
+        rollnumber,
+      });
       
+      if (response.status === 200) {
+        // Re-fetch previous requests to re-render the table
+        fetchPreviousRequests(rollnumber);
+        showToast('Request marked as completed successfully!');
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        showToast('Request already exists or there was an error processing it.');
+      } else {
+        showToast('An unexpected error occurred.');
+      }
+    }
+  };
+
   return (
     <>
+      {/* Toast Popup */}
+      {toastMessage && <div className={styles.toast}>{toastMessage}</div>}
 
-    <div className={styles["parent-container"]}>
-
-      <div className={styles["main-wrapper"]}>
-        <div className={styles.wrapper}>
-          <div className={styles.card}>
-            <input className={styles.input} type="radio" name="card" value="basic"/>
-            <span className={styles.check}></span>
-            <label className={styles.label}>
-              <div className={styles.my_title}>Cleaning</div>
-              <div className={styles.price}>
-                Room Cleaning / BathRoom Cleaning
-              </div>
-            </label>
-          </div>
-
-          <div className={styles.card}>
-            <input className={styles.input} type="radio" name="card" value="standart"/>
-            <span className={styles.check}></span>
-            <label className={styles.label}>
-              <div className={styles.my_title}>Maintain</div>
-              <div className={styles.price}>
-                Repair Electronics/Troubleshoot
-              </div>
-            </label>
-          </div>
+      <div className={styles['parent-container']}>
+        <div className={styles.navbar}>
+          {/* Dynamically display the user's name and either room number or hostel */}
+          {name} | {userType === 'Student' ? `Room No. ${roomNumber}` : `Hostel ${hostel}`}
+          <button className={styles.logoutButton} onClick={handleLogout}>
+            Logout
+          </button>
         </div>
 
-        <div className={styles["raise-request-container"]}>
-          <div className={styles.lower_card}>
-            <form className={styles.form}>
-              <button className={styles.btn}>Submit</button>
-            </form>
+        {/* Conditionally render the main-wrapper only for students */}
+        {userType === 'Student' && (
+          <div className={styles['main-wrapper']}>
+            <div className={styles.wrapper}>
+              <div className={styles.card}>
+                <input
+                  className={styles.input}
+                  type="radio"
+                  name="card"
+                  value="cleaning"
+                  onClick={() => handleServiceSelect('cleaning')}
+                />
+                <span className={styles.check}></span>
+                <label className={styles.label}>
+                  <div className={styles.my_title}>Cleaning</div>
+                  <div className={styles.price}>Room Cleaning / BathRoom Cleaning</div>
+                </label>
+              </div>
+
+              <div className={styles.card}>
+                <input
+                  className={styles.input}
+                  type="radio"
+                  name="card"
+                  value="maintain"
+                  onClick={() => handleServiceSelect('maintain')}
+                />
+                <span className={styles.check}></span>
+                <label className={styles.label}>
+                  <div className={styles.my_title}>Maintain</div>
+                  <div className={styles.price}>Repair Electronics/Troubleshoot</div>
+                </label>
+              </div>
+            </div>
+
+            <div className={styles['raise-request-container']}>
+              <div className={styles.lower_card}>
+                <form className={styles.form} onSubmit={handleSubmit}>
+                  <button className={styles.btn}>Submit</button>
+                </form>
+              </div>
+            </div>
           </div>
+        )}
+
+        <h2>Your {userType === 'Student' ? 'Previous' : 'Cleaning'} Requests:</h2>
+        <div>
+          <table className={styles.table}>
+            <thead>
+              <tr className={styles.tr}>
+                <th className={styles.th}>Request</th>
+                {userType === 'Cleaner'? 
+                <th className={styles.th}>Room No.</th>
+                :""}
+
+                <th className={styles.th}>Due Date</th>
+                <th className={styles.th}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {previousRequests.length > 0 &&
+                previousRequests.map((request, id) => (
+                  <tr className={styles.tr} key={id}>
+                    <td className={styles.td} data-label="Request">
+                      <img
+                        src={request.request === 'cleaning' ? '/cleaner.svg' : '/maintainence.svg'}
+                        alt=""
+                        className={styles.request_logo}
+                      />
+                      {request.request.toUpperCase()}
+                    </td>
+                    {userType === 'Cleaner'? 
+                    <td className={styles.td} data-label="Room No.">
+                      {request.room}
+                    </td> : ""}
+                    <td className={styles.td} data-label="Due Date">
+                      {formatDate(request.createdAt)}
+                    </td>
+                    <td className={styles.td} data-label="Status">
+                    {userType === 'Student' && request.status === "Pending" ?
+                    
+                    <div className={styles.pending_parent}>
+                    <div
+                        className={styles.ststyle}
+                        style={{ backgroundColor: request.status === 'Pending' ? '#F04F4F' : '#10A37F' }}>
+                        {request.status}
+                        </div>
+                        <button className={styles.btntick} onClick={()=>completeHandler(request.request)}><img src="./tick.svg" alt="" className={styles.finalTick} /></button>
+                    </div>
+                      :<div
+                        className={styles.ststyle}
+                        style={{ backgroundColor: request.status === 'Pending' ? '#F04F4F' : '#10A37F' }}>
+                        {request.status}
+                        </div>
+}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
       </div>
-
-<h2>Your Previous Requests:</h2>
-<div>
-      <table className={styles.table}>
-        <thead>
-          <tr className={styles.tr}>
-            <th className={styles.th}>Request</th>
-            <th className={styles.th}>Due Date</th>
-            <th className={styles.th}>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-    {dummyData.map((t,id)=>{
-        return (
-            <tr className={styles.tr} id=''>
-            <td className={styles.td} data-label="Request"><img src={t.request==="cleaning"?"/cleaner.svg" :"/maintainence.svg"} alt="" className={styles.request_logo} />{t.request.toLocaleUpperCase()}</td>
-            <td className={styles.td} data-label="Due Date">{t.date}</td>
-            <td className={styles.td} data-label="Status"><div className={styles.ststyle}  style={{ backgroundColor: t.status === "pending" ? "#F04F4F" : "#10A37F" }}>{t.status}</div></td>
-            </tr>
-        )
-    })}
-
-</tbody>
-      </table>
-    </div>
-
-
-      </div>
-      {/* <div>
-      <table className={styles.table}>
-        <thead>
-          <tr className={styles.tr}>
-            <th className={styles.th}>Account</th>
-            <th className={styles.th}>Due Date</th>
-            <th className={styles.th}>Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-          <tr className={styles.tr}>
-            <td className={styles.td} data-label="Account">Visa - 3412</td>
-            <td className={styles.td} data-label="Due Date">04/01/2016</td>
-            <td className={styles.td} data-label="Amount">$1,190</td>
-            </tr>
-          <tr className={styles.tr}>
-            <td className={styles.td} data-label="Account">Visa - 6076</td>
-            <td className={styles.td} data-label="Due Date">03/01/2016</td>
-            <td className={styles.td} data-label="Amount">$2,443</td>
-            </tr>
-          <tr className={styles.tr}>
-            <td className={styles.td} data-label="Account">Corporate AMEX</td>
-            <td className={styles.td} data-label="Due Date">03/01/2016</td>
-            <td className={styles.td} data-label="Amount">$1,181</td>
-            </tr>
-          <tr className={styles.tr}>
-            <td className={styles.td} data-label="Account">Visa - 3412</td>
-            <td className={styles.td} data-label="Due Date">02/01/2016</td>
-            <td className={styles.td} data-label="Amount">$842</td>
-            </tr>
-        </tbody>
-      </table>
-    </div> */}
     </>
   );
 };

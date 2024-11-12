@@ -42,27 +42,27 @@ route.post('/NeededToClean', async (req, res)=>{
     }
 })
 
-route.post('/cleanerchangepass', async (req, res)=>{
+// route.post('/cleanerchangepass', async (req, res)=>{
     
-    const oldPass = req.body.oldpass
+//     const oldPass = req.body.oldpass
 
-try{
+// try{
 
-    const cleaner = await Cleaner.findByCredentials(req.body.cleanerid, req.body.oldpass)
-    cleaner.password = req.body.newpass
-    console.log(cleaner)    
-    await cleaner.save()
+//     const cleaner = await Cleaner.findByCredentials(req.body.cleanerid, req.body.oldpass)
+//     cleaner.password = req.body.newpass
+//     console.log(cleaner)    
+//     await cleaner.save()
 
-    res.status(200).send(cleaner)
+//     res.status(200).send(cleaner)
 
-}
-catch(e){
+// }
+// catch(e){
 
-    res.status(400).send({error: e.message})
+//     res.status(400).send({error: e.message})
 
-}
+// }
 
-})
+// })
 
 
 module.exports = route

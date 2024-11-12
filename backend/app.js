@@ -93,7 +93,7 @@ try{
 
     const cleaner = await Cleaner.findByCredentials(req.body.cleanerid, req.body.oldpass)
     cleaner.password = req.body.newpass
-    console.log(cleaner)    
+    // console.log(cleaner)    
     await cleaner.save()
 
     res.status(200).send(cleaner)
@@ -104,7 +104,6 @@ catch(e){
     res.status(400).send({error: e.message})
 
 }
-// res.status(200).send()
 
     }
     else if (req.body.rollnumber) {
@@ -126,8 +125,6 @@ catch(e){
             res.status(400).send({ error: e.message })
 
         }
-
-        // res.status(200).send()
 
     }
 

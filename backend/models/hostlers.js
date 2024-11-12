@@ -48,7 +48,7 @@ UserSchema.statics.findByCredentials = async(rollnumber, password)=>{
     const hostler = await Hostler.findOne({rollnumber})
     
     if(!hostler){
-        return new Error('unable to login')
+        throw new Error('unable to login')
     }
 
     const isMatch = await bcrypt.compare(password, hostler.password)

@@ -1,6 +1,7 @@
 const express = require('express')
 const Hostler = require('../models/hostlers')
 const ToClean = require('../models/CleaningRecord')
+const bcrypt = require('bcrypt')
 
 const route = new express.Router()
 
@@ -94,6 +95,28 @@ try{
 catch(e){
 console.log(e)
 return res.status(400).send({error: "No request exists"})
+}
+
+})
+
+route.post('/changepass', async (req, res)=>{
+    
+    const oldPass = req.body.oldpass
+
+try{
+
+    const hostler = await Hostler.findByCredentials(req.body.rollnumber, req.body.oldpass)
+    hostler.password = req.body.newpass
+    // console.log(hostler)    
+    await hostler.save()
+
+    res.status(200).send(hostler)
+
+}
+catch(e){
+
+    res.status(400).send({error: e.message})
+
 }
 
 })

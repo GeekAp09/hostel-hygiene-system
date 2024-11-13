@@ -38,6 +38,8 @@ const Page = () => {
         // Fetch requests specific to cleaners
         fetchCleanerRequests(parsedUser.cleanerid);
       }
+    } else{
+      router.push("/Login")
     }
   }, []);
 
@@ -67,6 +69,10 @@ const Page = () => {
     }
   };
 
+
+  const handleChangePassword=()=>{
+    router.push('/ChangePassword');
+  }
   // Handle logout
   const handleLogout = () => {
     localStorage.removeItem('user'); // Clear user data from localStorage
@@ -138,6 +144,9 @@ const Page = () => {
           {name} | {userType === 'Student' ? `Room No. ${roomNumber}` : `Hostel ${hostel}`}
           <button className={styles.logoutButton} onClick={handleLogout}>
             Logout
+          </button>
+          <button className={styles.logoutButton} onClick={handleChangePassword}>
+            Change Password
           </button>
         </div>
 

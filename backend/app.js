@@ -29,62 +29,109 @@ app.use(CleanerRouter)
 
 // for Administrator pusrpose only
 
-app.post('/newhostler', async (req, res)=>{
+app.post('/newhostler', async (req, res) => {
 
     console.log(req.body)
-    try{
+    try {
         const hostler = new Hostler(req.body)
         await hostler.save()
         res.status(200).send(hostler)
     }
-    catch(e){
+    catch (e) {
         console.log(e)
         res.send(e)
     }
 })
 
-app.post('/newcleaner', async (req, res)=>{
+app.post('/newcleaner', async (req, res) => {
 
     console.log(req.body)
 
-    try{
+    try {
         const cleaner = new Cleaner(req.body)
         await cleaner.save()
         res.status(200).send(cleaner)
     }
-    catch(e){
+    catch (e) {
         console.log(e)
         res.send(e)
     }
 
 })
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
 
     res.send('hello')
 
 })
 
-app.get('/FetchTest', async (req, res)=>{
+app.get('/FetchTest', async (req, res) => {
 
-    try{
+    try {
         const requests = await ToClean.find({})
         console.log(requests)
         res.send(requests)
     }
-    
-    catch(e){
-    
+
+    catch (e) {
+
         console.log(e)
         res.send(e)
-    
+
     }
-    })    
+})
 
 // Main Endpoints ---- use routers
 
+app.post('/changepass', async (req, res) => {
 
+    if (req.body.cleanerid) {
 
-app.listen(3000, ()=>{
+    const oldPass = req.body.oldpass
+
+try{
+
+    const cleaner = await Cleaner.findByCredentials(req.body.cleanerid, req.body.oldpass)
+    cleaner.password = req.body.newpass
+    // console.log(cleaner)    
+    await cleaner.save()
+
+    res.status(200).send(cleaner)
+
+}
+catch(e){
+
+    res.status(400).send({error: e.message})
+
+}
+
+    }
+    else if (req.body.rollnumber) {
+        console.log("hii hostler")
+        const oldPass = req.body.oldpass
+
+        try {
+
+            const hostler = await Hostler.findByCredentials(req.body.rollnumber, req.body.oldpass)
+            hostler.password = req.body.newpass
+            // console.log(hostler)
+            await hostler.save()
+
+            res.status(200).send(hostler)
+
+        }
+        catch (e) {
+
+            res.status(400).send({ error: e.message })
+
+        }
+
+    }
+
+    else res.status(400).send()
+
+})
+
+app.listen(3000, () => {
     console.log('server is up!')
 })

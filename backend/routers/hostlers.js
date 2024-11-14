@@ -1,6 +1,7 @@
 const express = require('express')
 const Hostler = require('../models/hostlers')
 const ToClean = require('../models/CleaningRecord')
+const bcrypt = require('bcrypt')
 
 const route = new express.Router()
 
@@ -97,5 +98,6 @@ return res.status(400).send({error: "No request exists"})
 }
 
 })
+
 
 module.exports = route
